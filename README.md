@@ -1,4 +1,4 @@
-# ModelPublisher
+# Automated 3D Model Publisher
 
 Automates publishing 3D printable models across multiple platforms using Playwright browser automation.
 
