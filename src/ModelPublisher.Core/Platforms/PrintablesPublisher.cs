@@ -92,16 +92,18 @@ public class PrintablesPublisher : IPlatformPublisher
                 .GetByRole(AriaRole.Radio, new() { Name = "No — fully human-made" })
                 .CheckAsync();
 
-            // Step 8: Description
-            await page.Locator("section")
+            // Step 8: Description — inject HTML directly into TipTap's ProseMirror div
+            var descHtml = MarkdownHelper.ToTipTapHtml(manifest.Description);
+            var descEditor = page.Locator("section")
                 .Filter(new() { HasText = "Description" })
-                .GetByRole(AriaRole.Textbox)
-                .ClickAsync();
-            
-            await page.Locator("section")
-                .Filter(new() { HasText = "Description" })
-                .GetByRole(AriaRole.Textbox)
-                .FillAsync(manifest.GetDescription(this).Replace("\n\n", "\n"));
+                .GetByRole(AriaRole.Textbox);
+
+            await descEditor.ClickAsync();
+            await descEditor.EvaluateAsync(@"(el, html) => {
+                el.innerHTML = html;
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            }", descHtml);
 
 
             // Step 9: Upload photos
