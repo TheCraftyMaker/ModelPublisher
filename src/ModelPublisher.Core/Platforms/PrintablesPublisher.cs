@@ -98,6 +98,7 @@ public class PrintablesPublisher : IPlatformPublisher
                 .GetByRole(AriaRole.Textbox)
                 .ClickAsync();
             
+            
             await page.Locator("section")
                 .Filter(new() { HasText = "Description" })
                 .GetByRole(AriaRole.Textbox)
