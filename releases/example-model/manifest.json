@@ -1,13 +1,16 @@
 {
-  "title": "My Awesome Model",
-  "description": "A detailed description of the model.\n\nSupports markdown on most platforms.\n\n## Print Settings\n\n- Layer height: 0.2mm\n- Infill: 15%\n- Supports: No",
-  "tags": ["functional", "organizer", "home"],
+  "title": "Modular Cable Management Clips",
+  "description": "Keep your desk tidy with these stackable, snap-fit cable management clips. Designed to mount on the underside of a desk with a single screw or double-sided tape.\n\n## Features\n\n- Snap-fit design — no tools needed to add or remove cables\n- Stackable: clips nest together for multi-cable runs\n- Two sizes included: **narrow (up to 6mm)** and **wide (up to 12mm)**\n- Rounded edges to avoid cable wear\n\n## Print Settings\n\n- **Layer height:** 0.2mm\n- **Infill:** 20% gyroid\n- **Walls:** 3\n- **Supports:** No\n- **Material:** PETG recommended (PLA works too)\n\n## Assembly\n\n1. Print as many clips as you need.\n2. Mount the base to the underside of your desk.\n3. Press cables into the slot — the clip flexes open and snaps shut.\n4. Stack additional clips on top if running multiple cables.\n\n## Notes\n\nIf the snap feels too stiff or too loose, adjust wall count by ±1. Tested on a 25mm thick desk.",
+  "tags": ["cable-management", "desk", "organizer", "snap-fit", "modular"],
   "license": "CC-BY-4.0",
   "files": {
-    "models": ["./my-model.3mf"],
+    "models": [
+      "./cable-clip-narrow.3mf",
+      "./cable-clip-wide.3mf"
+    ],
     "photos": [
-      "./photo1.jpg",
-      "./photo2.jpg"
+      "./photo-mounted.jpg",
+      "./photo-detail.jpg"
     ]
   },
   "platforms": {
