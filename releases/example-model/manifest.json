@@ -5,6 +5,7 @@
   "license": "CC-BY-4.0",
   "files": {
     "models": ["./my-model.3mf"],
+    "cover": "./photo1.jpg",
     "photos": [
       "./photo1.jpg",
       "./photo2.jpg"

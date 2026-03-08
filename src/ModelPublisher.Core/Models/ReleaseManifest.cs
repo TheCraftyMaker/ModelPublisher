@@ -11,7 +11,7 @@ public class ReleaseManifest
     public string Title { get; init; } = "";
 
     [JsonPropertyName("description")] 
-    public string Description { private get; set; } = "";
+    public string Description { get; init; } = "";
 
     [JsonPropertyName("tags")]
     public List<string> Tags { get; init; } = [];
@@ -51,4 +51,25 @@ public class ManifestFiles
 
     [JsonPropertyName("photos")]
     public List<string> Photos { get; set; } = [];
+
+    /// <summary>
+    /// Optional. The photo to use as the preview/cover image.
+    /// If omitted, the first entry in Photos is used as the cover.
+    /// </summary>
+    [JsonPropertyName("cover")]
+    public string? Cover { get; set; }
+
+    /// <summary>
+    /// Returns photos ordered so the cover image is first, without duplicates.
+    /// If cover is already in Photos it is moved to the front; if not, it is prepended.
+    /// </summary>
+    public IEnumerable<string> PhotosWithCoverFirst()
+    {
+        if (Cover is null) return Photos;
+
+        var rest = Photos.Where(p => p != Cover);
+        return Photos.Contains(Cover)
+            ? rest.Prepend(Cover)
+            : new[] { Cover }.Concat(rest);
+    }
 }
