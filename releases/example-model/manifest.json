@@ -8,6 +8,7 @@
       "./cable-clip-narrow.3mf",
       "./cable-clip-wide.3mf"
     ],
+    "cover": "./photo1.jpg",
     "photos": [
       "./photo-mounted.jpg",
       "./photo-detail.jpg"
