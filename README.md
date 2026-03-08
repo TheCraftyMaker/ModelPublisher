@@ -4,55 +4,45 @@ Automates publishing 3D printable models across multiple platforms using Playwri
 
 ## Platforms
 
-| Key | Platform | Notes |
-|---|---|---|
-| `printables` | Printables.com | Free + Premium |
-| `makerworld` | MakerWorld.com | Free |
-| `cults3d` | Cults3D.com | Free |
-| `thangs` | Thangs.com | Free + Premium |
-| `makeronline` | Maker.online | Free |
-| `patreon` | Patreon.com | Free + Premium — semi-automated, always requires human review |
+| Key | Platform | Tiers | Status |
+|---|---|---|---|
+| `printables` | Printables.com | Free + Premium | Working |
+| `makerworld` | MakerWorld.com | Free | Stub — needs codegen selectors |
+| `cults3d` | Cults3D.com | Free | Stub — needs codegen selectors |
+| `thangs` | Thangs.com | Free + Premium | Stub — needs codegen selectors |
+| `makeronline` | Maker.online | Free | Stub — needs codegen selectors |
+| `patreon` | Patreon.com | Free + Premium | Stub — clipboard paste approach, needs verification |
 
 ## Prerequisites
 
-- .NET 9 SDK
+- .NET 10 SDK
+- [Brave Browser](https://brave.com/) installed at the default path (`C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe`)
 - Run once after build to install Playwright browsers:
 
 ```bash
-pwsh bin/Debug/net9.0/playwright.ps1 install chromium
-```
-
-Or on Windows without PowerShell Core:
-
-```bash
-dotnet run --project src/ModelPublisher.Cli -- --help
-# then:
-.\bin\Debug\net9.0\playwright.ps1 install chromium
+pwsh src/ModelPublisher.Cli/bin/Debug/net10.0/playwright.ps1 install chromium
 ```
 
 ## Setup
 
-1. Clone or copy to `C:\Source\ModelPublisher`
+1. Clone the repo
 2. Build the solution:
    ```bash
    dotnet build
    ```
 3. Install Playwright's Chromium browser (one-time):
    ```bash
-   dotnet run --project src/ModelPublisher.Cli -- --help
-   pwsh src/ModelPublisher.Cli/bin/Debug/net9.0/playwright.ps1 install chromium
+   pwsh src/ModelPublisher.Cli/bin/Debug/net10.0/playwright.ps1 install chromium
    ```
 4. On first run per platform, log in manually when prompted. Sessions are persisted in `profiles/` so you won't need to log in again until cookies expire.
 
-## Selectors
+## Implementing a stub platform
 
-The platform scripts contain placeholder selectors that **will need to be updated** before first use. Use Playwright's codegen tool to capture live selectors:
+For platforms marked as stubs, use Playwright's codegen tool to capture live selectors, then fill them in to the publisher class:
 
 ```bash
-pwsh src/ModelPublisher.Cli/bin/Debug/net9.0/playwright.ps1 codegen --target csharp https://www.printables.com/model/create
+pwsh src/ModelPublisher.Cli/bin/Debug/net10.0/playwright.ps1 codegen --target csharp https://www.makerworld.com/upload
 ```
-
-Replace the `TODO` selectors in each publisher class with what codegen captures.
 
 ## Release Workflow
 
