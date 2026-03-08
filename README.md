@@ -1,3 +1,5 @@
+[![.NET](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dotnet.yml/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dotnet.yml) [![CodeQL Advanced](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/codeql.yml/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/codeql.yml) 
+
 # Automated 3D Model Publisher
 
 Automates publishing 3D printable models across multiple platforms using Playwright browser automation.
