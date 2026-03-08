@@ -1,0 +1,36 @@
+{
+  "title": "My Awesome Model",
+  "description": "A detailed description of the model.\n\nSupports markdown on most platforms.\n\n## Print Settings\n- Layer height: 0.2mm\n- Infill: 15%\n- Supports: No",
+  "tags": ["functional", "organizer", "home"],
+  "license": "CC-BY-4.0",
+  "files": {
+    "model": "./my-model.3mf",
+    "photos": [
+      "./photo1.jpg",
+      "./photo2.jpg",
+      "./photo3.jpg"
+    ]
+  },
+  "platforms": {
+    "printables": {
+      "tier": "free"
+    },
+    "makerworld": {
+      "tier": "free"
+    },
+    "cults3d": {
+      "tier": "free"
+    },
+    "thangs": {
+      "tier": "free"
+    },
+    "makeronline": {
+      "tier": "free"
+    },
+    "patreon": {
+      "tier": "premium",
+      "free_post": false,
+      "access_tier_id": "YOUR_TIER_ID_HERE"
+    }
+  }
+}

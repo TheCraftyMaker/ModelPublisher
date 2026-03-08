@@ -1,0 +1,19 @@
+## Build outputs
+bin/
+obj/
+*.user
+
+## Playwright browser sessions — contain your login cookies, never commit
+profiles/
+
+## Publish result logs (optional — remove if you want to track these)
+**/publish-results-*.json
+
+## VS / Rider
+.vs/
+.idea/
+*.suo
+*.sln.docstates
+
+## dotnet
+*.nupkg
