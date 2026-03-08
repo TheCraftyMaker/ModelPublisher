@@ -60,16 +60,14 @@ public class ManifestFiles
     public string? Cover { get; set; }
 
     /// <summary>
-    /// Returns photos ordered so the cover image is first, without duplicates.
-    /// If cover is already in Photos it is moved to the front; if not, it is prepended.
+    /// Returns photos without duplicates, with the cover in the specified position.
+    /// coverFirst: true (default) = cover first; false = cover last (e.g. Printables).
     /// </summary>
-    public IEnumerable<string> PhotosWithCoverFirst()
+    public IEnumerable<string> PhotosOrdered(bool coverFirst = true)
     {
         if (Cover is null) return Photos;
 
         var rest = Photos.Where(p => p != Cover);
-        return Photos.Contains(Cover)
-            ? rest.Prepend(Cover)
-            : new[] { Cover }.Concat(rest);
+        return coverFirst ? rest.Prepend(Cover) : rest.Append(Cover);
     }
 }
