@@ -1,14 +1,13 @@
 {
   "title": "My Awesome Model",
-  "description": "A detailed description of the model.\n\nSupports markdown on most platforms.\n\n## Print Settings\n- Layer height: 0.2mm\n- Infill: 15%\n- Supports: No",
+  "description": "A detailed description of the model.\n\nSupports markdown on most platforms.\n\n## Print Settings\n\n- Layer height: 0.2mm\n- Infill: 15%\n- Supports: No",
   "tags": ["functional", "organizer", "home"],
   "license": "CC-BY-4.0",
   "files": {
-    "model": "./my-model.3mf",
+    "models": ["./my-model.3mf"],
     "photos": [
       "./photo1.jpg",
-      "./photo2.jpg",
-      "./photo3.jpg"
+      "./photo2.jpg"
     ]
   },
   "platforms": {
