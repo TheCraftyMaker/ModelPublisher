@@ -111,7 +111,7 @@ public class PrintablesPublisher : IPlatformPublisher
 
             var photoInput = page.Locator("input[type='file'][id='photos-upload-input']").First;
             await FileUploadHelper.UploadSequentialAsync(
-                page, photoInput, manifest.Files.PhotosWithCoverLast().Select(manifest.ResolveFilePath), PlatformName);
+                page, photoInput, manifest.Files.PhotosOrdered(coverFirst: false).Select(manifest.ResolveFilePath), PlatformName);
 
             // Step 10: License
             await page
