@@ -32,6 +32,8 @@ public class PatreonPublisher : IPlatformPublisher
     public bool IsFreeOnly => true; // Patreon posts aren't free, but we do not have both free and premium tiers
     public bool SupportsMarkdown => false;
 
+    public string Disclaimer => "";
+
     public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default)
     {
         try

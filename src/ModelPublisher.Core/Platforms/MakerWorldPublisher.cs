@@ -21,6 +21,8 @@ public class MakerWorldPublisher : IPlatformPublisher
     public bool IsFreeOnly => true;
     public bool SupportsMarkdown => true;
 
+    public string Disclaimer => "";
+
     public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default)
     {
         try

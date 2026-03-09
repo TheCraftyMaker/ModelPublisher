@@ -20,6 +20,8 @@ public class ThangsPublisher : IPlatformPublisher
 
     public bool IsFreeOnly => false;
     public bool SupportsMarkdown => true;
+
+    public string Disclaimer => "";
     
     public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default)
     {

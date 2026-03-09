@@ -17,6 +17,12 @@ public interface IPlatformPublisher
     
     bool SupportsMarkdown => false;
 
+    /// <summary>
+    /// Platform-specific disclaimer appended to the bottom of every description (markdown format).
+    /// Return empty string to omit.
+    /// </summary>
+    string Disclaimer => "";
+
     Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default);
     
     Task<PublishResult> PublishPremiumAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default);
