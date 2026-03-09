@@ -38,10 +38,28 @@ public class ReleaseManifest
         return Path.GetFullPath(Path.Combine(ManifestDirectory, relativePath));
     }
     
+    /// <summary>
+    /// Returns the description with the platform's disclaimer appended, formatted for the platform
+    /// (markdown if supported, plain text otherwise).
+    /// </summary>
     public string GetDescription(IPlatformPublisher publisher)
-        => publisher.SupportsMarkdown
-            ? Description
-            : MarkdownHelper.ToPlainText(Description);
+    {
+        var markdown = AppendDisclaimer(Description, publisher.Disclaimer);
+        return publisher.SupportsMarkdown ? markdown : MarkdownHelper.ToPlainText(markdown);
+    }
+
+    /// <summary>
+    /// Returns the description with the platform's disclaimer appended, always as markdown.
+    /// Use this when the caller handles its own format conversion (e.g. TipTap HTML injection).
+    /// </summary>
+    public string GetDescriptionMarkdown(IPlatformPublisher publisher)
+        => AppendDisclaimer(Description, publisher.Disclaimer);
+
+    private static string AppendDisclaimer(string description, string disclaimer)
+    {
+        if (string.IsNullOrWhiteSpace(disclaimer)) return description;
+        return $"{description}\n\n---\n\n{disclaimer}";
+    }
 }
 
 public class ManifestFiles

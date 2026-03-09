@@ -16,6 +16,8 @@ public class PrintablesPublisher : IPlatformPublisher
     public bool IsFreeOnly => false;
     public bool SupportsMarkdown => false;
 
+    public string Disclaimer => "";
+
     public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page,
         CancellationToken ct = default)
     {
@@ -93,7 +95,7 @@ public class PrintablesPublisher : IPlatformPublisher
                 .CheckAsync();
 
             // Step 8: Description — inject HTML directly into TipTap's ProseMirror div
-            var descHtml = MarkdownHelper.ToTipTapHtml(manifest.Description);
+            var descHtml = MarkdownHelper.ToTipTapHtml(manifest.GetDescriptionMarkdown(this));
             var descEditor = page.Locator("section")
                 .Filter(new() { HasText = "Description" })
                 .GetByRole(AriaRole.Textbox);
