@@ -16,10 +16,12 @@
   },
   "platforms": {
     "printables": {
-      "tier": "free"
+      "tier": "free",
+      "print_profiles": ["./profiles/printables-0.2mm-pla.3mf"]
     },
     "makerworld": {
-      "tier": "free"
+      "tier": "free",
+      "print_profiles": ["./profiles/makerworld-0.2mm-pla.3mf"]
     },
     "cults3d": {
       "tier": "free"
