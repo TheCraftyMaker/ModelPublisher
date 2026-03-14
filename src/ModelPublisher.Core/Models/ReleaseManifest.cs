@@ -60,6 +60,18 @@ public class ReleaseManifest
         if (string.IsNullOrWhiteSpace(disclaimer)) return description;
         return $"{description}\n\n---\n\n{disclaimer}";
     }
+
+    private static readonly JsonSerializerOptions ConfigJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    public T? GetPlatformConfig<T>(string platformKey) where T : PlatformConfig, new()
+    {
+        if (!Platforms.TryGetValue(platformKey, out var el))
+            return null;
+        return JsonSerializer.Deserialize<T>(el, ConfigJsonOptions) ?? new T();
+    }
 }
 
 public class ManifestFiles
