@@ -38,9 +38,7 @@ public class PatreonPublisher : IPlatformPublisher
     {
         try
         {
-            // TODO: use config.FreePost and config.AccessTierId when Patreon automation is implemented
-            var config = manifest.GetPlatformConfig<PatreonConfig>(PlatformKey) ?? new PatreonConfig();
-            _ = config;
+            // TODO: read manifest.GetPlatformConfig<PatreonConfig>(PlatformKey) for FreePost and AccessTierId when Patreon automation is implemented
 
             await page.GotoAsync("https://www.patreon.com/posts/create");
 
