@@ -146,16 +146,9 @@ public class PublishCommand
     /// </summary>
     private static string? ResolveTier(ReleaseManifest manifest, IPlatformPublisher publisher)
     {
-        if (!manifest.Platforms.TryGetValue(publisher.PlatformKey, out var config))
-            return null;
-
-        if (config.ValueKind == JsonValueKind.Object
-            && config.TryGetProperty("tier", out var tierProp))
-        {
-            var tier = tierProp.GetString()?.ToLowerInvariant();
-            return tier is "free" or "premium" ? tier : "free";
-        }
-
-        return "free";
+        var config = manifest.GetPlatformConfig<PlatformConfig>(publisher.PlatformKey);
+        if (config is null) return null;
+        var tier = config.Tier.ToLowerInvariant();
+        return tier is "free" or "premium" ? tier : "free";
     }
 }

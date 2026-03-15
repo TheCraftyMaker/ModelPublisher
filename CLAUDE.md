@@ -26,7 +26,9 @@ dotnet run --project src\ModelPublisher.Cli -- "C:\Users\chris\Downloads\Models\
 | `src/ModelPublisher.Core/Shared/AuthGuard.cs` | Pauses for human login when not authenticated |
 | `src/ModelPublisher.Core/Shared/FileUploadHelper.cs` | `UploadSequentialAsync` — uploads one file at a time, waits for NetworkIdle |
 | `src/ModelPublisher.Core/Shared/MarkdownHelper.cs` | `ToPlainText` and `ToTipTapHtml` — converts markdown for platforms that need it |
-| `src/ModelPublisher.Core/Models/ReleaseManifest.cs` | Deserializes manifest.json |
+| `src/ModelPublisher.Core/Models/ReleaseManifest.cs` | Deserializes manifest.json; `GetPlatformConfig<T>()` deserializes typed platform config |
+| `src/ModelPublisher.Core/Models/PlatformConfig.cs` | Base record with `Tier` + `PrintProfiles` — all platform configs inherit from this |
+| `src/ModelPublisher.Core/Platforms/PatreonConfig.cs` | Patreon-specific config: `FreePost`, `AccessTierId` |
 | `src/ModelPublisher.Core/Models/PublishResult.cs` | Result record — `Tier` is set by orchestrator via `with`, not by publishers |
 
 ## Manifest format
@@ -42,12 +44,23 @@ dotnet run --project src\ModelPublisher.Cli -- "C:\Users\chris\Downloads\Models\
     "photos": ["./cover-photo.jpg", "./detail.jpg"]
   },
   "platforms": {
-    "printables": { "tier": "free" }
+    "printables": {
+      "tier": "free",
+      "print_profiles": ["./profiles/printables-0.2mm.3mf"]
+    },
+    "patreon": {
+      "tier": "premium",
+      "free_post": false,
+      "access_tier_id": "YOUR_TIER_ID"
+    }
   }
 }
 ```
 - `cover` is optional. If set, `PhotosOrdered(coverFirst)` deduplicates and positions it.
 - `manifest.ManifestDirectory` is set after deserialization; use `ResolveFilePath()` for all file paths.
+- `print_profiles` is optional on any platform; defaults to `[]`. Paths are relative to manifest dir.
+- To read typed config in a publisher: `manifest.GetPlatformConfig<PlatformConfig>(PlatformKey)` (returns `null` if platform not listed). Use a subclass (e.g. `PatreonConfig`) for platform-specific fields.
+- `Platforms` stays `Dictionary<string, JsonElement>` internally — `GetPlatformConfig<T>` deserializes on demand.
 
 ## Platform status
 | Key | Platform | Status |
@@ -78,6 +91,12 @@ dotnet run --project src\ModelPublisher.Cli -- "C:\Users\chris\Downloads\Models\
 - **PublishResult.Tier**: init-only, set by orchestrator with `result with { Tier = tier! }`. Publishers do not set it.
 - **Spectre.Console**: any string containing `[` or `]` from user data must be wrapped in `Markup.Escape()`.
 - **System.CommandLine 2.0.3**: `SetAction` + `ParseResult.GetValue` only — old `Handler` API removed.
+
+## Slopwatch
+- Installed globally: `dotnet tool install --global Slopwatch.Cmd` (v0.4.0)
+- Baseline initialized at `.slopwatch/baseline.json` (0 pre-existing issues on master)
+- Run after code changes: `powershell.exe -Command "cd 'C:\Source\ModelPublisher'; slopwatch analyze -d ."`
+- Detects: disabled tests, empty catch blocks, warning suppression, arbitrary delays, NoWarn in csproj, CPM bypass
 
 ## GitHub workflow
 - Repo: https://github.com/TheCraftyMaker/ModelPublisher

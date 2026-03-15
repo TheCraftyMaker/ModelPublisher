@@ -38,6 +38,8 @@ public class PatreonPublisher : IPlatformPublisher
     {
         try
         {
+            // TODO: read manifest.GetPlatformConfig<PatreonConfig>(PlatformKey) for FreePost and AccessTierId when Patreon automation is implemented
+
             await page.GotoAsync("https://www.patreon.com/posts/create");
 
             await AuthGuard.EnsureLoggedInAsync(page, PlatformName, async p =>
