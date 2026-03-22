@@ -41,19 +41,23 @@ public class ThangsPublisher : IPlatformPublisher
                 .GetByTestId("action-upload-models")
                 .ClickAsync();
 
-            // Step 1: Model files
-            AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading model file...");
+            // Step 1: Model files — intercept file chooser so React registers the selection
+            AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading model files...");
 
-            var modelFileInput = page.Locator("input[multiple]").First;
-            await modelFileInput.FocusAsync();
+            var modelChooser = await page
+                .RunAndWaitForFileChooserAsync(() => page.GetByTestId("full-page-upload-container").ClickAsync());
+            
+            await modelChooser
+                .SetFilesAsync(manifest.Files.Models.Select(manifest.ResolveFilePath).ToArray());
 
-            await FileUploadHelper.UploadSequentialAsync(
-                page, modelFileInput, manifest.Files.Models.Select(manifest.ResolveFilePath), PlatformName);
+            var uploadMode = page.GetByTestId("upload-mode-collection");
+            await uploadMode.WaitForAsync();
+            await uploadMode.ClickAsync();
 
-            await page.GetByTestId("upload-mode-collection").ClickAsync();
-
-            await page.Locator("label[for='terms-acceptance']").ClickAsync();
-
+            var terms = page.Locator("label[for='terms-acceptance']");
+            await terms.WaitForAsync();
+            await terms.ClickAsync();
+            
             await page
                 .GetByTestId("file-selector-buttons-upload-files")
                 .ClickAsync();
@@ -89,31 +93,58 @@ public class ThangsPublisher : IPlatformPublisher
                 await page.WaitForTimeoutAsync(300);
             }
 
-            // Step 6: Upload photos
+            // Step 6: Upload photos — set all at once
             AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading photos...");
 
             var photoInput = page.Locator("input[multiple][accept*='.jpg']").First;
-            await FileUploadHelper.UploadSequentialAsync(
-                page, photoInput, manifest.Files.PhotosOrdered(coverFirst: false).Select(manifest.ResolveFilePath),
-                PlatformName);
+            await FileUploadHelper
+                .UploadToInputAsync(photoInput, manifest.Files.PhotosOrdered(coverFirst: false).Select(manifest.ResolveFilePath).ToArray());
+            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-            // Step 7: Audience
-            await page.Locator("[class*='Audience_VisibilityItem']").First.ClickAsync();
-            await page.GetByText("Public sharing").ClickAsync();
+            // Step 7: Audience — retry clicking the trigger until the dialog opens
+            await page
+                .GetByTestId("model-upload-audience")
+                .WaitForAsync();
+            
+            var audienceTrigger = page.Locator("span[aria-haspopup='dialog']:has([data-testid='model-upload-audience'])");
+            await audienceTrigger.ScrollIntoViewIfNeededAsync();
+            var publicSharingOption = page.GetByText("Public sharing");
+            for (var attempt = 0; attempt < 5; attempt++)
+            {
+                await audienceTrigger.ClickAsync();
+                try
+                {
+                    await publicSharingOption.WaitForAsync(new() { Timeout = 2_000 });
+                    break;
+                }
+                catch { /* dropdown didn't open, retry */ }
+            }
+            await publicSharingOption.ClickAsync();
 
             // Step 7: License
-            await page.GetByRole(AriaRole.Button, new() { Name = "Select a license" }).ClickAsync();
-            await page.GetByText("by-nc-sa_4_0.txt").First.ClickAsync();
+            await page
+                .GetByRole(AriaRole.Button, new() { Name = "Select a license" })
+                .ClickAsync();
+            
+            await page
+                .GetByText("by-nc-sa_4_0.txt").First
+                .ClickAsync();
 
-            // Step 8: Human review before publishing
-            AnsiConsole.MarkupLine(
-                $"[yellow][[{PlatformName}]][/] Review the form in the browser. Press [green]Enter[/] to publish...");
+            // Step 8: Save — wait for button to be enabled, then click (Thangs uses data-test-id, not data-testid)
+            AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Saving...");
+            await Assertions
+                .Expect(page.Locator("[data-test-id='save-and-publish-model-details']"))
+                .ToBeEnabledAsync(new() { Timeout = 60_000 });
+            
+            await page
+                .Locator("[data-test-id='save-and-publish-model-details']")
+                .ClickAsync();
+            
+            AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Save clicked.");
 
-            await Task.Run(Console.ReadLine, ct);
-
-            // Step 9: Save
-            await page.GetByTestId("save-model-details").ClickAsync();
-
+            // Step 9: Close the upload dialog (non-fatal if already closed/navigated)
+            await page.Locator("[class*='FullPageUpload_Header_CloseIcon']").ClickAsync();
+                
             await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
             return new PublishResult(PlatformName, true, page.Url, null);

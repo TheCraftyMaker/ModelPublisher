@@ -16,7 +16,7 @@ public class PrintablesPublisher : IPlatformPublisher
     public bool IsFreeOnly => false;
     public bool SupportsMarkdown => false;
 
-    public string Disclaimer => "";
+    public string Disclaimer => GetDisclaimer();
 
     public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page,
         CancellationToken ct = default)
@@ -115,18 +115,13 @@ public class PrintablesPublisher : IPlatformPublisher
                 GetByRole(AriaRole.Button, new() { Name = "Creative Commons — Attribution — Noncommercial — Share Alike" })
                 .ClickAsync();
 
-            // Step 11: Human confirmation before publish
-            AnsiConsole.MarkupLine(
-                $"[yellow][[{PlatformName}]][/] Review the form in the browser. Press [green]Enter[/] to publish...");
-            
-            await Task.Run(Console.ReadLine, ct);
-
-            // Step 12: Submit
+            // Step 11: Submit
             await page
                 .GetByRole(AriaRole.Button, new() { Name = "Save draft" })
                 .ClickAsync();
    
-            await page.WaitForURLAsync("**/model/**", new() { Timeout = 30_000 });
+            // Wait for URL to change away from /model/create to the saved model URL (e.g. /model/12345-slug)
+            await page.WaitForURLAsync(url => url.Contains("/model/") && !url.Contains("/model/create"), new() { Timeout = 30_000 });
 
             return new PublishResult(PlatformName, true, page.Url, null);
         }
@@ -139,5 +134,12 @@ public class PrintablesPublisher : IPlatformPublisher
     public Task<PublishResult> PublishPremiumAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default)
     {
         throw new NotImplementedException();
+    }
+    
+    private static string GetDisclaimer()
+    {
+        return "_ALL The Crafty Maker designs are protected by Copyright Law. By downloading, YOU HAVE NO RIGHT to " +
+               "sell any digital files or reproductions from those files. If you want a commercial license to LEGALLY " +
+               "SELL 3D prints, you'll need a The Crafty Seller Patreon subscription._";
     }
 }
