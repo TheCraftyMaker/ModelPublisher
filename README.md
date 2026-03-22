@@ -1,4 +1,4 @@
-[![.NET](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dotnet.yml/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dotnet.yml) [![CodeQL Advanced](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/codeql.yml/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/codeql.yml) 
+[![.NET](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dotnet.yml/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dotnet.yml) [![CodeQL Advanced](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/codeql.yml/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/codeql.yml) [![Dependabot Updates](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dependabot/dependabot-updates)
 
 # Automated 3D Model Publisher
 
