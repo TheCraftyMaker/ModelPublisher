@@ -79,6 +79,12 @@ dotnet run --project src\ModelPublisher.Cli -- "C:\Users\chris\Downloads\Models\
 - **Spectre.Console**: any string containing `[` or `]` from user data must be wrapped in `Markup.Escape()`.
 - **System.CommandLine 2.0.3**: `SetAction` + `ParseResult.GetValue` only — old `Handler` API removed.
 
+## Slopwatch
+- Installed globally: `dotnet tool install --global Slopwatch.Cmd` (v0.4.0)
+- Baseline initialized at `.slopwatch/baseline.json` (0 pre-existing issues on master)
+- Run after code changes: `powershell.exe -Command "cd 'C:\Source\ModelPublisher'; slopwatch analyze -d ."`
+- Detects: disabled tests, empty catch blocks, warning suppression, arbitrary delays, NoWarn in csproj, CPM bypass
+
 ## GitHub workflow
 - Repo: https://github.com/TheCraftyMaker/ModelPublisher
 - `master` is protected — PRs required, no direct pushes, enforce_admins=true
