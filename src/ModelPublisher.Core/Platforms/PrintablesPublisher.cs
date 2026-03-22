@@ -47,25 +47,16 @@ public class PrintablesPublisher : IPlatformPublisher
             // Step 2: Model Title
             await page
                 .GetByRole(AriaRole.Textbox, new() { Name = "Model name (required)" })
-                .ClickAsync();
-            
-            await page
-                .GetByRole(AriaRole.Textbox, new() { Name = "Model name (required)" })
                 .FillAsync(manifest.Title);
 
             // Step 3: Model Summary
             await page
                 .GetByRole(AriaRole.Textbox, new() { Name = "Summary (required)" })
-                .ClickAsync();
-            
-            await page
-                .GetByRole(AriaRole.Textbox, new() { Name = "Summary (required)" })
                 .FillAsync(manifest.Title);
 
             // Step 4: Model Category
-            // await page.GetByRole(AriaRole.Button, new() { Name = "Main category (required)" }).ClickAsync();
-            // await page.GetByRole(AriaRole.Button, new() { Name = manifest.Category }).ClickAsync();
-
+            // TODO: Manually for now
+            
             // Step 5: Tags
             await page
                 .GetByRole(AriaRole.Textbox, new() { Name = "Additional tags" })

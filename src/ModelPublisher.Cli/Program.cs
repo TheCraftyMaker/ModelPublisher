@@ -1,5 +1,7 @@
 using System.CommandLine;
+using Microsoft.Playwright;
 using ModelPublisher.Core;
+using ModelPublisher.Core.Shared;
 using Spectre.Console;
 
 var manifestArg = new Argument<FileInfo>("manifest")
@@ -37,5 +39,31 @@ rootCommand.SetAction(async (parseResult, ct) =>
         ct
     );
 });
+
+// codegen <platformKey> <url> — opens Brave with the platform's persistent profile and pauses for inspection
+var codegenPlatformArg = new Argument<string>("platform") { Description = "Platform key (e.g. thangs)" };
+var codegenUrlArg = new Argument<string>("url") { Description = "URL to navigate to" };
+var codegenCommand = new Command("codegen", "Open Brave with a platform profile for selector inspection")
+{
+    codegenPlatformArg,
+    codegenUrlArg
+};
+codegenCommand.SetAction(async (parseResult, ct) =>
+{
+    var platformKey = parseResult.GetValue(codegenPlatformArg)!;
+    var url = parseResult.GetValue(codegenUrlArg)!;
+
+    AnsiConsole.MarkupLine($"[cyan]Opening Brave with profile '[bold]{platformKey}[/]' at {Markup.Escape(url)}[/]");
+    AnsiConsole.MarkupLine("[yellow]Use the Playwright Inspector to inspect selectors. Close the browser when done.[/]");
+
+    using var playwright = await Playwright.CreateAsync();
+    var context = await BrowserContextFactory.GetPersistentContextAsync(playwright, platformKey);
+    var page = await context.NewPageAsync();
+    await page.GotoAsync(url);
+    await page.PauseAsync();
+    await context.CloseAsync();
+    return 0;
+});
+rootCommand.Add(codegenCommand);
 
 return await rootCommand.Parse(args).InvokeAsync();
