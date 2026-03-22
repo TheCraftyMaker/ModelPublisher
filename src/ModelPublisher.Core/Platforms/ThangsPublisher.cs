@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 using ModelPublisher.Core.Models;
 using ModelPublisher.Core.Shared;
@@ -23,8 +22,9 @@ public class ThangsPublisher : IPlatformPublisher
     public bool SupportsMarkdown => true;
 
     public string Disclaimer => GetDisclaimer();
-    
-    public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default)
+
+    public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page,
+        CancellationToken ct = default)
     {
         try
         {
@@ -32,74 +32,75 @@ public class ThangsPublisher : IPlatformPublisher
 
             await AuthGuard.EnsureLoggedInAsync(page, PlatformName,
                 p => Task.FromResult(p.Url.Contains("mythangs")), ct);
-            
+
             await page
                 .GetByRole(AriaRole.Button, new() { Name = "Add new" })
                 .ClickAsync();
-            
+
             await page
                 .GetByTestId("action-upload-models")
                 .ClickAsync();
-            
+
             // Step 1: Model files
             AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading model file...");
-            
+
             var modelFileInput = page.Locator("input[multiple]").First;
-            modelFileInput.FocusAsync();
+            await modelFileInput.FocusAsync();
 
             await FileUploadHelper.UploadSequentialAsync(
                 page, modelFileInput, manifest.Files.Models.Select(manifest.ResolveFilePath), PlatformName);
 
             await page.GetByTestId("upload-mode-collection").ClickAsync();
-            
+
             await page.Locator("label[for='terms-acceptance']").ClickAsync();
-            
+
             await page
                 .GetByTestId("file-selector-buttons-upload-files")
                 .ClickAsync();
-            
+
             // Step 2: Model Title
             await page
                 .GetByTestId("model-upload-name-input")
                 .ClearAsync();
-            
+
             await page
                 .GetByTestId("model-upload-name-input")
                 .FillAsync(manifest.Title);
-            
+
             // Step 3: Model Description
             await page
                 .GetByTestId("model-upload-description-input")
                 .FillAsync(manifest.GetDescription(this));
-            
+
             // Step 4: Model Category
             // TODO: Manually for now
-            
+
             // Step 5: Tags
             foreach (var tag in manifest.Tags)
             {
                 await page
                     .GetByTestId("cy_tag_input")
                     .FillAsync(tag);
-                
+
                 await page
                     .GetByTestId("cy_tag_input")
                     .PressAsync("Enter");
-                
+
                 await page.WaitForTimeoutAsync(300);
             }
-            
+
             // Step 6: Upload photos
             AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading photos...");
 
             var photoInput = page.Locator("input[multiple][accept*='.jpg']").First;
             await FileUploadHelper.UploadSequentialAsync(
-                page, photoInput, manifest.Files.PhotosOrdered(coverFirst: false).Select(manifest.ResolveFilePath), PlatformName);
+                page, photoInput, manifest.Files.PhotosOrdered(coverFirst: false).Select(manifest.ResolveFilePath),
+                PlatformName);
 
             // Step 7: Audience
             await page.Locator("[class*='Audience_VisibilityItem']").First.ClickAsync();
             await page.GetByText("Public sharing").ClickAsync();
-            
+
             // Step 7: License
             await page.GetByRole(AriaRole.Button, new() { Name = "Select a license" }).ClickAsync();
             await page.GetByText("by-nc-sa_4_0.txt").First.ClickAsync();
@@ -107,12 +108,12 @@ public class ThangsPublisher : IPlatformPublisher
             // Step 8: Human review before publishing
             AnsiConsole.MarkupLine(
                 $"[yellow][[{PlatformName}]][/] Review the form in the browser. Press [green]Enter[/] to publish...");
-            
+
             await Task.Run(Console.ReadLine, ct);
 
             // Step 9: Save
             await page.GetByTestId("save-model-details").ClickAsync();
-            
+
             await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
             return new PublishResult(PlatformName, true, page.Url, null);
