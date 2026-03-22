@@ -82,31 +82,35 @@ public class PublishCommand
         AnsiConsole.WriteLine();
 
         var session = new PublishSession { ManifestPath = manifestPath };
+        var consoleLock = new object();
 
         using var playwright = await Playwright.CreateAsync();
 
-        foreach (var (publisher, tier) in runnablePublishers)
+        var tasks = runnablePublishers.Select(async x =>
         {
-            AnsiConsole.Write(new Rule($"[bold]{publisher.PlatformName}[/] [dim]({tier})[/]").LeftJustified());
-
             await using var context = await BrowserContextFactory.GetPersistentContextAsync(
-                playwright, publisher.PlatformKey);
+                playwright, x.Publisher.PlatformKey);
 
             var page = await context.NewPageAsync();
 
-            var result = tier == "premium"
-                ? await publisher.PublishPremiumAsync(manifest, page, ct)
-                : await publisher.PublishFreeAsync(manifest, page, ct);
+            var result = x.Tier == "premium"
+                ? await x.Publisher.PublishPremiumAsync(manifest, page, ct)
+                : await x.Publisher.PublishFreeAsync(manifest, page, ct);
 
-            session.Results.Add(result with { Tier = tier! });
-            
-            if (result.Success)
-                AnsiConsole.MarkupLine($"[green]✓ {result.Platform}[/] → {Markup.Escape(result.PublishedUrl ?? "")}");
-            else
-                AnsiConsole.MarkupLine($"[red]✗ {result.Platform}[/] — {Markup.Escape(result.ErrorMessage ?? "")}");
-           
-            AnsiConsole.WriteLine();
-        }
+            var resultWithTier = result with { Tier = x.Tier! };
+
+            lock (consoleLock)
+            {
+                if (result.Success)
+                    AnsiConsole.MarkupLine($"[green]✓ {result.Platform}[/] → {Markup.Escape(result.PublishedUrl ?? "")}");
+                else
+                    AnsiConsole.MarkupLine($"[red]✗ {result.Platform}[/] — {Markup.Escape(result.ErrorMessage ?? "")}");
+            }
+
+            return resultWithTier;
+        });
+
+        session.Results.AddRange(await Task.WhenAll(tasks));
 
         // Summary
         AnsiConsole.Write(new Rule("[bold]Summary[/]").LeftJustified());
