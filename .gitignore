@@ -17,3 +17,7 @@ profiles/
 
 ## dotnet
 *.nupkg
+
+## Node.js (stealth launcher dependencies)
+node_modules/
+package-lock.json

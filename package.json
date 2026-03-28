@@ -1,0 +1,30 @@
+{
+  "name": "modelpublisher",
+  "version": "1.0.0",
+  "description": "[![.NET](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dotnet.yml/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dotnet.yml) [![CodeQL Advanced](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/codeql.yml/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/codeql.yml) [![Dependabot Updates](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/TheCraftyMaker/ModelPublisher/actions/workflows/dependabot/dependabot-updates)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheCraftyMaker/ModelPublisher.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/TheCraftyMaker/ModelPublisher/issues"
+  },
+  "homepage": "https://github.com/TheCraftyMaker/ModelPublisher#readme",
+  "dependencies": {
+    "playwright": "^1.58.2",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

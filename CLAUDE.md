@@ -108,3 +108,30 @@ dotnet run --project src\ModelPublisher.Cli -- "C:\Users\chris\Downloads\Models\
 
 ## Browser profiles
 Persistent Chromium sessions stored in `profiles/{platformKey}/` relative to working directory. Gitignored — contains login cookies. On first run per platform, the browser pauses for manual login.
+
+## Cloudflare / bot detection
+Cloudflare detects Playwright's CDP protocol and blocks access even when a human clicks "I'm human". This affects MakerWorld and Patreon. Two mitigations are in place in `BrowserContextFactory`:
+- `--disable-blink-features=AutomationControlled` launch arg
+- Init script removing `navigator.webdriver`, spoofing canvas/WebGL/plugins
+
+When these aren't enough, use `--profile-path` to run with the real Brave profile (which has `cf_clearance` cookies from normal browsing). **Brave must be fully closed first.**
+
+```bash
+# For publishing:
+dotnet run --project src\ModelPublisher.Cli -- "manifest.json" --platforms makerworld --profile-path "C:\Users\chris\AppData\Local\BraveSoftware\Brave-Browser\User Data\Profile 1"
+
+# For codegen:
+dotnet run --project src\ModelPublisher.Cli -- codegen makerworld https://makerworld.com/en/my/models/publish?type=original --profile-path "C:\Users\chris\AppData\Local\BraveSoftware\Brave-Browser\User Data\Profile 1"
+```
+
+Google OAuth is blocked in all automated browsers (Playwright injects CDP which Google detects). Log into Cloudflare-protected platforms using email/password, not Google, during the AuthGuard pause.
+
+## Running Playwright codegen
+`npx playwright codegen` does NOT work from Claude Code's bash shell (node not on PATH, GUI can't open in background). Always run codegen manually from a Windows terminal.
+
+**For sites without Cloudflare / bot detection** — use the .NET playwright.ps1 (built output):
+```powershell
+pwsh "C:\Source\ModelPublisher\src\ModelPublisher.Cli\bin\Debug\net10.0\playwright.ps1" codegen https://example.com
+```
+
+**For sites with Cloudflare / Google auth (e.g. Patreon)** — codegen won't work (Chromium is blocked). Instead: open the page in the regular Brave browser, interact with the form, and use DevTools (F12) to inspect elements. Paste HTML snippets into the conversation to extract selectors.
