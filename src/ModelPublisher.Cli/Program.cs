@@ -89,7 +89,7 @@ codegenCommand.SetAction(async (parseResult, ct) =>
 
     using var playwright = await Playwright.CreateAsync();
     var context = stealth
-        ? await BrowserContextFactory.GetStealthContextAsync(playwright, profilePath)
+        ? await BrowserContextFactory.GetStealthContextAsync(playwright, platformKey, profilePath)
         : await BrowserContextFactory.GetPersistentContextAsync(playwright, platformKey, profilePathOverride: profilePath);
     var page = await context.NewPageAsync();
     await page.GotoAsync(url);

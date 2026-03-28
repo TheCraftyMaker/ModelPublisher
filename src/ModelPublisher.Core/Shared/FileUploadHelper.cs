@@ -27,7 +27,8 @@ public static class FileUploadHelper
         IPage page,
         ILocator fileInput,
         IEnumerable<string> filePaths,
-        string platformName)
+        string platformName,
+        int networkIdleTimeoutMs = 0)
     {
         foreach (var path in filePaths)
         {
@@ -35,10 +36,19 @@ public static class FileUploadHelper
                 throw new FileNotFoundException($"Upload file not found: {path}");
 
             AnsiConsole.MarkupLine($"  [dim]Uploading {Path.GetFileName(path)}...[/] to {platformName}");
-            
+
             await fileInput.SetInputFilesAsync(path);
-            
-            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+            var loadStateOptions = networkIdleTimeoutMs > 0
+                ? new PageWaitForLoadStateOptions { Timeout = networkIdleTimeoutMs }
+                : null;
+
+            try
+            {
+                await page.WaitForLoadStateAsync(LoadState.NetworkIdle, loadStateOptions);
+            }
+            catch (TimeoutException) { /* SPA keeps background requests open — best-effort wait */ }
+
             await page.WaitForTimeoutAsync(300);
         }
     }

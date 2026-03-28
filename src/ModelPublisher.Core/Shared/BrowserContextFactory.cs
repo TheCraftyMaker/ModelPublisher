@@ -116,6 +116,7 @@ public static class BrowserContextFactory
     /// </summary>
     public static async Task<IBrowserContext> GetStealthContextAsync(
         IPlaywright playwright,
+        string platformKey,
         string? profilePathOverride = null)
     {
         var port = GetFreePort();
@@ -124,21 +125,25 @@ public static class BrowserContextFactory
             AppContext.BaseDirectory, "..", "..", "..", "..", "..", "stealth-launcher.js"));
         var nodeExe = @"C:\Program Files\nodejs\node.exe";
 
-        var arguments = $"\"{launcherPath}\" {port}";
-        if (profilePathOverride != null)
-            arguments += $" \"{profilePathOverride}\"";
+        // Use the real Brave profile if provided, otherwise fall back to the persistent platform profile
+        var effectiveProfilePath = profilePathOverride
+            ?? Path.GetFullPath(Path.Combine("profiles", platformKey));
+        Directory.CreateDirectory(Path.GetFullPath(Path.Combine("profiles", platformKey)));
 
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = nodeExe,
-                Arguments = arguments,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
             }
         };
+        // Use ArgumentList so .NET handles quoting — avoids newline/space issues with paths
+        process.StartInfo.ArgumentList.Add(launcherPath);
+        process.StartInfo.ArgumentList.Add(port.ToString());
+        process.StartInfo.ArgumentList.Add(effectiveProfilePath);
         process.Start();
 
         // Wait for the READY signal from the launcher

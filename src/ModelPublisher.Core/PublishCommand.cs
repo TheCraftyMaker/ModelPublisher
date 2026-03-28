@@ -91,7 +91,7 @@ public class PublishCommand
         var tasks = runnablePublishers.Select(async x =>
         {
             await using var context = stealth
-                ? await BrowserContextFactory.GetStealthContextAsync(playwright, profilePathOverride)
+                ? await BrowserContextFactory.GetStealthContextAsync(playwright, x.Publisher.PlatformKey, profilePathOverride)
                 : await BrowserContextFactory.GetPersistentContextAsync(playwright, x.Publisher.PlatformKey, profilePathOverride: profilePathOverride);
 
             var page = await context.NewPageAsync();
