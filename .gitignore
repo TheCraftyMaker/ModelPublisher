@@ -15,6 +15,10 @@ profiles/
 *.suo
 *.sln.docstates
 
+## Local IDE debug configs — contain machine-specific paths
+.vscode/
+src/ModelPublisher.Cli/Properties/launchSettings.json
+
 ## dotnet
 *.nupkg
 
