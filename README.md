@@ -11,7 +11,7 @@ Automates publishing 3D printable models across multiple platforms using Playwri
 | `printables` | Printables.com | Free + Premium | Working |
 | `makerworld` | MakerWorld.com | Free | Stub — needs codegen selectors |
 | `cults3d` | Cults3D.com | Free | Stub — needs codegen selectors |
-| `thangs` | Thangs.com | Free + Premium | Stub — needs codegen selectors |
+| `thangs` | Thangs.com | Free + Premium | Working |
 | `makeronline` | Maker.online | Free | Stub — needs codegen selectors |
 | `patreon` | Patreon.com | Free + Premium | Stub — clipboard paste approach, needs verification |
 
@@ -43,8 +43,11 @@ pwsh src/ModelPublisher.Cli/bin/Debug/net10.0/playwright.ps1 install chromium
 For platforms marked as stubs, use Playwright's codegen tool to capture live selectors, then fill them in to the publisher class:
 
 ```bash
-pwsh src/ModelPublisher.Cli/bin/Debug/net10.0/playwright.ps1 codegen --target csharp https://www.makerworld.com/upload
+# Close Brave first, then run:
+dotnet run --project src\ModelPublisher.Cli -- codegen <platformKey> <url> --profile-path "C:\Users\chris\AppData\Local\BraveSoftware\Brave-Browser\User Data\Profile 1"
 ```
+
+The `--profile-path` option lets you reuse your real Brave session (already logged in). Brave must be fully closed before running this command.
 
 ## Release Workflow
 
@@ -69,24 +72,32 @@ dotnet run --project src/ModelPublisher.Cli -- releases/my-model-name/manifest.j
 # Publish to specific platforms only
 dotnet run --project src/ModelPublisher.Cli -- releases/my-model-name/manifest.json --platforms printables makerworld
 
-# From C:\Source\ModelPublisher:
-dotnet run --project src/ModelPublisher.Cli -- "C:\Source\ModelPublisher\releases\my-model-name\manifest.json"
+# Use your real Brave profile to bypass Cloudflare (close Brave first)
+dotnet run --project src/ModelPublisher.Cli -- releases/my-model-name/manifest.json --platforms makerworld --profile-path "C:\Users\chris\AppData\Local\BraveSoftware\Brave-Browser\User Data\Profile 1"
 ```
-
-## Human-in-the-loop steps
-
-Every platform pauses before the final publish action and waits for you to press Enter. This lets you:
-- Catch any mis-filled fields
-- Select categories or subcategories not covered by automation
-- Handle CAPTCHAs if they appear
-
-Patreon additionally requires manual access tier selection due to the complexity of their UI.
 
 ## Auth
 
 On first run per platform, if you're not logged in, the browser will pause and prompt you to log in manually. After logging in, press Enter in the terminal. The session is saved to `profiles/<platform>/` and reused on subsequent runs.
 
 The `profiles/` directory is gitignored. Do not commit it — it contains your session cookies.
+
+### Cloudflare-protected platforms (MakerWorld, Patreon)
+
+Cloudflare detects Playwright's CDP protocol at the network level. Use `--stealth` to launch via [playwright-extra](https://github.com/berstend/puppeteer-extra) with the stealth plugin, which patches the browser to remove automation markers:
+
+```bash
+# Stealth mode (bypasses Cloudflare bot detection)
+dotnet run --project src\ModelPublisher.Cli -- "manifest.json" --platforms makerworld --stealth
+
+# Stealth + real Brave profile (best combination — close Brave first)
+dotnet run --project src\ModelPublisher.Cli -- "manifest.json" --platforms makerworld --stealth --profile-path "C:\Users\chris\AppData\Local\BraveSoftware\Brave-Browser\User Data\Profile 1"
+
+# Stealth codegen (for inspecting selectors on Cloudflare-protected sites)
+dotnet run --project src\ModelPublisher.Cli -- codegen makerworld https://makerworld.com/en/my/models/publish?type=original --stealth
+```
+
+Requires Node.js and `npm install` in the project root (one-time setup).
 
 ## Adding a new platform
 

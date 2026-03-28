@@ -15,5 +15,13 @@ profiles/
 *.suo
 *.sln.docstates
 
+## Local IDE debug configs — contain machine-specific paths
+.vscode/
+src/ModelPublisher.Cli/Properties/launchSettings.json
+
 ## dotnet
 *.nupkg
+
+## Node.js (stealth launcher dependencies)
+node_modules/
+package-lock.json

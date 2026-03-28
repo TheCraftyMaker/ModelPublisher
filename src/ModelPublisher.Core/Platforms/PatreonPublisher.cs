@@ -38,13 +38,10 @@ public class PatreonPublisher : IPlatformPublisher
     {
         try
         {
-            await page.GotoAsync("https://www.patreon.com/posts/create");
+            await page.GotoAsync("https://www.patreon.com/c/TheCraftyMaker");
 
-            await AuthGuard.EnsureLoggedInAsync(page, PlatformName, async p =>
-            {
-                return await p.Locator("[data-tag='user-avatar'], .UserAvatar, [aria-label*='profile' i]")
-                              .First.IsVisibleAsync();
-            }, ct);
+            await AuthGuard.EnsureLoggedInAsync(page, PlatformName, 
+                async p => await p.Locator("[data-tag='account-menu-toggle-switcher']").First.IsVisibleAsync(), ct);
 
             AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Filling post details...");
 

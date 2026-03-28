@@ -17,59 +17,30 @@ public class MakerWorldPublisher : IPlatformPublisher
 {
     public string PlatformKey => "makerworld";
     public string PlatformName => "MakerWorld";
-    
+
     public bool IsFreeOnly => true;
     public bool SupportsMarkdown => true;
 
-    public string Disclaimer => "";
+    public string Disclaimer => GetDisclaimer();
 
-    public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default)
+    public async Task<PublishResult> PublishFreeAsync(ReleaseManifest manifest, IPage page,
+        CancellationToken ct = default)
     {
         try
         {
-            await page.GotoAsync("https://makerworld.com/en/create");
+            await page.GotoAsync("https://makerworld.com/en/my/models/publish?type=original");
 
-            await AuthGuard.EnsureLoggedInAsync(page, PlatformName, async p =>
-            {
-                return await p.Locator(".user-avatar, [data-testid='user-avatar'], .avatar-wrapper")
-                              .First.IsVisibleAsync();
-            }, ct);
+            await AuthGuard
+                .EnsureLoggedInAsync(page, PlatformName,
+                    async p => await p
+                        .Locator("img[src='https://public-cdn.bblmw.com/avatar/d59a9d40-0c79-11ee-9a50-b1cd743d2b1a." +
+                                 "jpg?x-oss-process=image/resize,w_60/format,webp']").First
+                        .IsVisibleAsync(), ct);
 
-            AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Filling model details...");
-
-            // TODO: Replace selectors after running codegen
-            await page.Locator("input[name='title'], input[placeholder*='title' i]").First.FillAsync(manifest.Title);
-
-            var descEditor = page.Locator("textarea[name='description'], [contenteditable='true']").First;
-            await descEditor.ClickAsync();
-            await descEditor.FillAsync(manifest.GetDescription(this));
-
-            // Tags
-            foreach (var tag in manifest.Tags)
-            {
-                var tagInput = page.Locator("input[placeholder*='tag' i]").First;
-                await tagInput.FillAsync(tag);
-                await tagInput.PressAsync("Enter");
-                await page.WaitForTimeoutAsync(300);
-            }
-
-            // Model file upload
-            AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading model file...");
-            var modelInput = page.Locator("input[type='file']").First;
-            // await modelInput.SetInputFilesAsync(manifest.ResolveFilePath(manifest.Files.Model));
-            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-            // Photos
-            AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading photos...");
-            var photoInput = page.Locator("input[type='file'][accept*='image']").First;
-            await FileUploadHelper.UploadSequentialAsync(page, photoInput,
-                manifest.Files.Photos.Select(manifest.ResolveFilePath), PlatformName);
-
-            AnsiConsole.MarkupLine($"[yellow][[{PlatformName}]][/] Review the form in the browser. Press [green]Enter[/] to publish...");
-            await Task.Run(() => Console.ReadLine(), ct);
-
-            await page.Locator("button:has-text('Publish'), button[type='submit']").First.ClickAsync();
-            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            // Step 1: Specific platform print profile(s)
+            await UploadFiles(manifest, page);
+            
+            
 
             return new PublishResult(PlatformName, true, page.Url, null);
         }
@@ -82,5 +53,64 @@ public class MakerWorldPublisher : IPlatformPublisher
     public Task<PublishResult> PublishPremiumAsync(ReleaseManifest manifest, IPage page, CancellationToken ct = default)
     {
         throw new NotImplementedException();
+    }
+
+    private async Task UploadFiles(ReleaseManifest manifest, IPage page)
+    {
+        // Step 1: Specific platform print profile(s)
+        var config = manifest.GetPlatformConfig<PlatformConfig>(PlatformKey);
+        if (config != null && config.PrintProfiles.Any())
+        {
+            AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading MakerWorld specific profile...");
+
+            await page
+                .GetByRole(AriaRole.Radio, new() { Name = "Yes (earn extra points reward)" })
+                .CheckAsync();
+
+            var profileInput = page.Locator("input[type='file'][accept='.3mf']").First;
+
+            var profilePath = config.PrintProfiles.Select(manifest.ResolveFilePath).First();
+
+            await FileUploadHelper.UploadSequentialAsync(page, profileInput, [profilePath], PlatformName, networkIdleTimeoutMs: 10_000);
+        }
+        else
+        {
+            AnsiConsole.MarkupLine(
+                $"[cyan][[{PlatformName}]][/] No MakerWorld specific profile found. Skipping...");
+
+            await page
+                .GetByRole(AriaRole.Radio, new() { Name = "I have STL/CAD files or other types of 3MF files" })
+                .CheckAsync();
+        }
+
+        // Step 2: Model files
+        AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading model files...");
+
+        var pathsToExclude = new List<string>();
+        if (config != null && config.PrintProfiles.Any())
+        {
+            pathsToExclude.AddRange(config.PrintProfiles.Select(manifest.ResolveFilePath));
+        }
+        
+        var nonProfileModelFiles = manifest.Files.Models
+            .Select(manifest.ResolveFilePath)
+            .Except(pathsToExclude);
+
+        var modelInput = page.Locator(
+            "input[type='file'][accept='.3ds, .amf, .blend, .dwg, .dxf, .f3d, .f3z, .factory, .fcstd, .iges, .ipt, .obj, .ply, .py, .rsdoc, .scad, .shape, .shapr, .skp, .sldasm, .sldprt, .slvs, .step, .stl, .stp, .studio3, .zip, .3mf, .stpz, .fcstd']").First;
+
+        await FileUploadHelper.UploadSequentialAsync(page, modelInput, nonProfileModelFiles, PlatformName, networkIdleTimeoutMs: 10_000);
+        
+        await page
+            .GetByRole(AriaRole.Button, new() { Name = "Next Step" })
+            .ClickAsync();
+    }
+    
+    private static string GetDisclaimer()
+    {
+        return "_ALL The Crafty Maker designs are protected by Copyright Law. By downloading, YOU HAVE NO RIGHT " +
+               "to sell any digital files or reproductions from those files. If you want a commercial license to " +
+               "LEGALLY SELL 3D prints, you'll need a [The Crafty Seller Patreon](https://patreon.com/TheCraftyMaker) " +
+               "subscription._";
     }
 }

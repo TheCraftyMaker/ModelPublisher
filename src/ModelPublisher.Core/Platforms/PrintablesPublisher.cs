@@ -25,12 +25,9 @@ public class PrintablesPublisher : IPlatformPublisher
         {
             await page.GotoAsync("https://www.printables.com/model/create");
 
-            await AuthGuard.EnsureLoggedInAsync(page, PlatformName, async p =>
-            {
-                // Logged-in indicator: avatar or user menu visible
-                return await p.Locator("[data-cy='user-menu'], .user-avatar, [aria-label='User menu']")
-                    .First.IsVisibleAsync();
-            }, ct);
+            await AuthGuard
+                .EnsureLoggedInAsync(page, PlatformName, 
+                    async p => await p.Locator("[data-cy='user-menu'], .user-avatar, [aria-label='User menu']").First.IsVisibleAsync(), ct);
 
             // Step 1: Model files
             AnsiConsole.MarkupLine($"[cyan][[{PlatformName}]][/] Uploading model file...");
