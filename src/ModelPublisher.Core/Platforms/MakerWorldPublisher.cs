@@ -71,7 +71,7 @@ public class MakerWorldPublisher : IPlatformPublisher
 
             var profilePath = config.PrintProfiles.Select(manifest.ResolveFilePath).First();
 
-            await FileUploadHelper.UploadSequentialAsync(page, profileInput, [profilePath], PlatformName);
+            await FileUploadHelper.UploadSequentialAsync(page, profileInput, [profilePath], PlatformName, networkIdleTimeoutMs: 10_000);
         }
         else
         {
@@ -97,11 +97,9 @@ public class MakerWorldPublisher : IPlatformPublisher
             .Except(pathsToExclude);
 
         var modelInput = page.Locator(
-            "input[type='file'][accept*='.3ds, .amf, .blend, .dwg, .dxf, .f3d, .f3z, .factory, " +
-            ".fcstd, .iges, .ipt, .obj, .ply, .py, .rsdoc, .scad, .shape, .shapr, .skp, .sldasm, " +
-            ".sldprt, .slvs, .step, .stl, .stp, .studio3, .zip, .3mf, .stpz, .fcstd']").First;
+            "input[type='file'][accept='.3ds, .amf, .blend, .dwg, .dxf, .f3d, .f3z, .factory, .fcstd, .iges, .ipt, .obj, .ply, .py, .rsdoc, .scad, .shape, .shapr, .skp, .sldasm, .sldprt, .slvs, .step, .stl, .stp, .studio3, .zip, .3mf, .stpz, .fcstd']").First;
 
-        await FileUploadHelper.UploadSequentialAsync(page, modelInput, nonProfileModelFiles, PlatformName);
+        await FileUploadHelper.UploadSequentialAsync(page, modelInput, nonProfileModelFiles, PlatformName, networkIdleTimeoutMs: 10_000);
         
         await page
             .GetByRole(AriaRole.Button, new() { Name = "Next Step" })

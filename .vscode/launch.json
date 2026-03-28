@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "MakerWorld (stealth)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/ModelPublisher.Cli/bin/Debug/net10.0/modelpublisher.dll",
+      "args": [
+        "C:\\Users\\chris\\Downloads\\Models\\Star Trek Ships\\manifest.json",
+        "--platforms", "makerworld",
+        "--stealth",
+        "--profile-path", "C:\\Users\\chris\\AppData\\Local\\BraveSoftware\\Brave-Browser\\User Data\\Profile 1"
+      ],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build"
+    },
+    {
+      "name": "Printables",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/ModelPublisher.Cli/bin/Debug/net10.0/modelpublisher.dll",
+      "args": [
+        "C:\\Users\\chris\\Downloads\\Models\\Star Trek Ships\\manifest.json",
+        "--platforms", "printables"
+      ],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build"
+    }
+  ]
+}

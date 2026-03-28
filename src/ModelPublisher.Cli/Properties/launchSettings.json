@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "MakerWorld (stealth)": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\chris\\Downloads\\Models\\Star Trek Ships\\manifest.json\" --platforms makerworld --stealth --profile-path \"C:\\Users\\chris\\AppData\\Local\\BraveSoftware\\Brave-Browser\\User Data\\Profile 1\""
+    },
+    "Printables": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\chris\\Downloads\\Models\\Star Trek Ships\\manifest.json\" --platforms printables"
+    }
+  }
+}
