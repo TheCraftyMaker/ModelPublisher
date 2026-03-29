@@ -1,8 +1,16 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:ModelPublisher.ManifestEditor.Converters"
              x:Class="ModelPublisher.ManifestEditor.App"
              RequestedThemeVariant="Dark">
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+    <Application.Resources>
+        <SolidColorBrush x:Key="MissingFileBrush" Color="#ef4444" />
+        <SolidColorBrush x:Key="NormalFileBrush" Color="#d4d4d4" />
+        <local:BoolToBrushConverter x:Key="MissingFileColorConverter"
+                                    TrueBrush="{StaticResource MissingFileBrush}"
+                                    FalseBrush="{StaticResource NormalFileBrush}" />
+    </Application.Resources>
 </Application>

@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ModelPublisher.ManifestEditor.ViewModels"
+             x:Class="ModelPublisher.ManifestEditor.Views.BasicInfoView"
+             x:DataType="vm:BasicInfoViewModel">
+
+    <StackPanel Spacing="16">
+        <StackPanel Spacing="4">
+            <TextBlock Text="Title" FontWeight="SemiBold" />
+            <TextBox Text="{Binding Title}" Watermark="Model title (required)" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="Tags" FontWeight="SemiBold" />
+            <ItemsControl ItemsSource="{Binding Tags}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Border Background="#1e3a5f" CornerRadius="12"
+                                Padding="8,3" Margin="0,0,4,4">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                <Button Content="x" Padding="0"
+                                        Background="Transparent" BorderThickness="0"
+                                        FontSize="14" VerticalAlignment="Center"
+                                        Command="{Binding $parent[UserControl].((vm:BasicInfoViewModel)DataContext).RemoveTagCommand}"
+                                        CommandParameter="{Binding}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBox Text="{Binding NewTagText}"
+                         Watermark="Add tag..."
+                         MinWidth="150"
+                         KeyDown="TagInput_KeyDown" />
+                <Button Content="Add" Command="{Binding SubmitNewTagCommand}" />
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="License" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding LicenseOptions}"
+                      SelectedItem="{Binding License}"
+                      MinWidth="200" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

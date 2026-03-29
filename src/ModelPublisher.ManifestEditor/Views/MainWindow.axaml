@@ -1,7 +1,62 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ModelPublisher.ManifestEditor.ViewModels"
+        xmlns:views="using:ModelPublisher.ManifestEditor.Views"
         x:Class="ModelPublisher.ManifestEditor.Views.MainWindow"
-        Title="Manifest Editor"
-        Width="900" Height="650">
-    <TextBlock Text="Loading..." HorizontalAlignment="Center" VerticalAlignment="Center" />
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding WindowTitle}"
+        Width="960" Height="680"
+        MinWidth="720" MinHeight="500">
+
+    <Grid ColumnDefinitions="160,*">
+
+        <!-- Sidebar -->
+        <DockPanel Grid.Column="0" Background="#0d0d0d">
+            <!-- Open + Save at the bottom -->
+            <StackPanel DockPanel.Dock="Bottom" Margin="8,0,8,12" Spacing="6">
+                <Button Content="Save"
+                        Command="{Binding SaveCommand}"
+                        IsEnabled="{Binding CanSave}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center" />
+                <Button Content="Open..."
+                        Command="{Binding OpenCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center" />
+            </StackPanel>
+
+            <!-- Section nav -->
+            <ListBox ItemsSource="{Binding Sections}"
+                     SelectedItem="{Binding ActiveSection}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Margin="4,8,4,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding SectionName}" Padding="4,2" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+
+        <!-- Content area -->
+        <Border Grid.Column="1" BorderBrush="#2a2a2a" BorderThickness="1,0,0,0">
+            <ContentControl Content="{Binding ActiveSection}" Margin="20">
+                <ContentControl.DataTemplates>
+                    <DataTemplate DataType="vm:BasicInfoViewModel">
+                        <views:BasicInfoView />
+                    </DataTemplate>
+                    <DataTemplate DataType="vm:FilesViewModel">
+                        <views:FilesView />
+                    </DataTemplate>
+                    <DataTemplate DataType="vm:DescriptionViewModel">
+                        <views:DescriptionView />
+                    </DataTemplate>
+                    <DataTemplate DataType="vm:PlatformsViewModel">
+                        <views:PlatformsView />
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+        </Border>
+    </Grid>
 </Window>

@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ModelPublisher.ManifestEditor.ViewModels"
+             x:Class="ModelPublisher.ManifestEditor.Views.PlatformsView"
+             x:DataType="vm:PlatformsViewModel">
+
+    <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding Entries}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:PlatformEntryViewModel">
+                    <Border BorderBrush="#2a2a2a" BorderThickness="1"
+                            CornerRadius="6" Margin="0,0,0,8">
+                        <StackPanel>
+                            <!-- Toggle header -->
+                            <StackPanel Orientation="Horizontal" Spacing="10"
+                                        Margin="12,10,12,10">
+                                <CheckBox IsChecked="{Binding IsEnabled}" />
+                                <TextBlock Text="{Binding PlatformName}"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Config (only when enabled) -->
+                            <StackPanel IsVisible="{Binding IsEnabled}"
+                                        Margin="16,0,16,12" Spacing="10">
+                                <Border BorderBrush="#333" BorderThickness="0,1,0,0" />
+
+                                <!-- Tier -->
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Tier" FontSize="12" Foreground="#888" />
+                                    <ComboBox ItemsSource="{Binding TierOptions}"
+                                              SelectedItem="{Binding Tier}"
+                                              MinWidth="160" />
+                                </StackPanel>
+
+                                <!-- Print profiles -->
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Print profiles" FontSize="12" Foreground="#888" />
+                                    <ItemsControl ItemsSource="{Binding PrintProfiles}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:FileEntryViewModel">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,3">
+                                                    <TextBlock Text="{Binding DisplayName}"
+                                                               Foreground="{Binding IsMissing, Converter={StaticResource MissingFileColorConverter}}"
+                                                               VerticalAlignment="Center" />
+                                                    <Button Content="X" Padding="3,1"
+                                                            Command="{Binding $parent[UserControl].((vm:PlatformEntryViewModel)DataContext).RemovePrintProfileCommand}"
+                                                            CommandParameter="{Binding}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <Button Content="Add print profile..."
+                                            Command="{Binding AddPrintProfileCommand}" />
+                                </StackPanel>
+
+                                <!-- Patreon-specific -->
+                                <StackPanel IsVisible="{Binding IsPatreon}" Spacing="8">
+                                    <Border BorderBrush="#333" BorderThickness="0,1,0,0" />
+                                    <CheckBox IsChecked="{Binding FreePost}"
+                                              Content="Free post (visible without Patreon subscription)" />
+                                    <StackPanel Spacing="4" IsVisible="{Binding !FreePost}">
+                                        <TextBlock Text="Access Tier ID" FontSize="12" Foreground="#888" />
+                                        <TextBox Text="{Binding AccessTierId}"
+                                                 Watermark="e.g. tier_abc123"
+                                                 MinWidth="260" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+</UserControl>

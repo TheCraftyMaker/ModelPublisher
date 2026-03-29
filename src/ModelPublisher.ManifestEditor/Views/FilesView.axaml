@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ModelPublisher.ManifestEditor.ViewModels"
+             x:Class="ModelPublisher.ManifestEditor.Views.FilesView"
+             x:DataType="vm:FilesViewModel">
+
+    <ScrollViewer>
+        <StackPanel Spacing="20">
+
+            <!-- Model Files -->
+            <StackPanel Spacing="6">
+                <TextBlock Text="Model Files" FontWeight="SemiBold" />
+                <ItemsControl ItemsSource="{Binding ModelFiles}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FileEntryViewModel">
+                            <Grid ColumnDefinitions="*,32,32,32" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding DisplayName}"
+                                           Foreground="{Binding IsMissing, Converter={StaticResource MissingFileColorConverter}}"
+                                           VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="Up" Padding="4,2"
+                                        Command="{Binding $parent[UserControl].((vm:FilesViewModel)DataContext).MoveUpModelFileCommand}"
+                                        CommandParameter="{Binding}" />
+                                <Button Grid.Column="2" Content="Dn" Padding="4,2"
+                                        Command="{Binding $parent[UserControl].((vm:FilesViewModel)DataContext).MoveDownModelFileCommand}"
+                                        CommandParameter="{Binding}" />
+                                <Button Grid.Column="3" Content="X" Padding="4,2"
+                                        Command="{Binding $parent[UserControl].((vm:FilesViewModel)DataContext).RemoveModelFileCommand}"
+                                        CommandParameter="{Binding}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Content="Add model file..." Command="{Binding AddModelFileCommand}" />
+            </StackPanel>
+
+            <!-- Photos -->
+            <StackPanel Spacing="6">
+                <TextBlock Text="Photos" FontWeight="SemiBold" />
+                <ItemsControl ItemsSource="{Binding Photos}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FileEntryViewModel">
+                            <Grid ColumnDefinitions="*,32,32,32" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding DisplayName}"
+                                           Foreground="{Binding IsMissing, Converter={StaticResource MissingFileColorConverter}}"
+                                           VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="Up" Padding="4,2"
+                                        Command="{Binding $parent[UserControl].((vm:FilesViewModel)DataContext).MoveUpPhotoCommand}"
+                                        CommandParameter="{Binding}" />
+                                <Button Grid.Column="2" Content="Dn" Padding="4,2"
+                                        Command="{Binding $parent[UserControl].((vm:FilesViewModel)DataContext).MoveDownPhotoCommand}"
+                                        CommandParameter="{Binding}" />
+                                <Button Grid.Column="3" Content="X" Padding="4,2"
+                                        Command="{Binding $parent[UserControl].((vm:FilesViewModel)DataContext).RemovePhotoCommand}"
+                                        CommandParameter="{Binding}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Content="Add photo..." Command="{Binding AddPhotoCommand}" />
+            </StackPanel>
+
+            <!-- Cover -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Cover photo" FontWeight="SemiBold" />
+                <TextBlock Text="(optional - defaults to first photo)" Foreground="#666" FontSize="11" />
+                <ComboBox ItemsSource="{Binding CoverOptions}"
+                          SelectedItem="{Binding SelectedCover}"
+                          MinWidth="250">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{Binding, FallbackValue='(none - use first photo)'}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

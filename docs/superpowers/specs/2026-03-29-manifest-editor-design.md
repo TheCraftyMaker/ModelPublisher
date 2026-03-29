@@ -81,8 +81,8 @@ CommunityToolkit.Mvvm throughout. `[ObservableProperty]` generates property boil
 - **License** -- dropdown, pre-populated with common SPDX identifiers (CC-BY-4.0, CC-BY-SA-4.0, CC-BY-NC-4.0, MIT, GPL-3.0, etc.); defaults to CC-BY-4.0
 
 ### Files
-- **Model files** -- list of file paths with a remove button per item, plus an "Add file..." button that opens a native file picker defaulting to the manifest directory
-- **Photos** -- same list pattern as model files
+- **Model files** -- list of file paths with up/down reorder buttons and a remove button per item, plus an "Add file..." button that opens a native file picker defaulting to the manifest directory
+- **Photos** -- same list pattern as model files, with up/down reorder buttons (order matters -- Printables treats the last-uploaded photo as the cover)
 - **Cover photo** -- optional dropdown populated from the photos list; empty option = "none (use first photo)"
 - All paths stored relative to the manifest directory; shown as absolute paths in the UI for readability
 
@@ -146,6 +146,6 @@ All checks run when the Save button is clicked. If any fail, a dialog lists all 
 ## Out of Scope (v1)
 
 - Markdown live preview
-- Drag-and-drop file reordering
+- Drag-and-drop file reordering (up/down buttons are in v1)
 - CLI integration (launch publish from the editor)
 - In-app platform status / publish history
