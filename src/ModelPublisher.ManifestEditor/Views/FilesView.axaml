@@ -70,7 +70,7 @@
                           MinWidth="250">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
-                            <TextBlock Text="{Binding, FallbackValue='(none - use first photo)'}" />
+                            <TextBlock Text="{Binding FallbackValue='(none - use first photo)'}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
