@@ -1,0 +1,7 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ModelPublisher.ManifestEditor.Views.MainWindow"
+        Title="Manifest Editor"
+        Width="900" Height="650">
+    <TextBlock Text="Loading..." HorizontalAlignment="Center" VerticalAlignment="Center" />
+</Window>
